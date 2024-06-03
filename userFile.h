@@ -12,7 +12,9 @@ class UserFile :public File
 {
     CMarkup xml;
 public:
-    UserFile (string userFileName) : File(userFileName){}
+    UserFile (string userFileName) : File(userFileName){
+        loadUsersFromFile();
+    }
     vector <User> loadUsersFromFile();
     bool addUserToFile (User &user);
     bool changePasswordInFile(int id, const string &password);

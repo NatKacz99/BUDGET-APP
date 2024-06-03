@@ -2,37 +2,41 @@
 
 vector <User> UserFile::loadUsersFromFile()
 {
-    vector <User> users;
-    User user;
+    vector<User> users;
     if(!xml.Load(getFileName())){
         cout << "File doesn't exist" << endl;
         return users;
     }
     else{
+        User user;
         xml.ResetPos();
-        xml.FindElem();
-        xml.IntoElem();
-        xml.FindElem();
-        do{
+        if (xml.FindElem("Root")){
             xml.IntoElem();
+            while (xml.FindElem("User")){
+                xml.IntoElem();
 
-            xml.FindElem("id");
-            user.id = stoi(xml.GetData());
+                xml.FindElem("id");
+                user.id = stoi(xml.GetData());
+                if (user.id > lastId) {
+                    lastId = user.id;
+                }
 
-            xml.FindElem("name");
-            user.name = xml.GetData();
+                xml.FindElem("name");
+                user.name = xml.GetData();
 
-            xml.FindElem("surname");
-            user.surname = xml.GetData();
+                xml.FindElem("surname");
+                user.surname = xml.GetData();
 
-            xml.FindElem("login");
-            user.login = xml.GetData();
+                xml.FindElem("login");
+                user.login = xml.GetData();
 
-            xml.FindElem("password");
-            user.password = xml.GetData();
+                xml.FindElem("password");
+                user.password = xml.GetData();
 
-            xml.OutOfElem();
-        } while(xml.FindElem());
+                users.push_back(user);
+                xml.OutOfElem();
+            }
+        }
     }
     return users;
 }

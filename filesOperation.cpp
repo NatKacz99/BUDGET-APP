@@ -5,7 +5,7 @@ vector <Operation> FilesOperation::loadOperationsFromFile (const int loggedUserI
     Operation operation;
     vector <Operation> operations;
     if(!xml.Load(getFileName())){
-        cout << "File doesn't exit" << endl;
+        cout << "File doesn't exist" << endl;
         return operations;
     }
     else{

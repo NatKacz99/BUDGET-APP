@@ -58,8 +58,8 @@ void UserManager::registerUser()
 {
     system ("cls");
     User user = enterUserData();
-    users.push_back(user);
     userFile.addUserToFile(user);
+    users.push_back(user);
 }
 void UserManager::loginUser()
 {
