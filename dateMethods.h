@@ -13,7 +13,8 @@ using namespace std;
 
 class DateMethods{
 static void calculateCurrentDate(map<string, int> &currentDate);
-static int isYearLeap(int year);
+static int returnNumberOfDaysInMonth(string year, string month);
+static bool isYearLeap(string &year);
 public:
 static tm getCurrentTime();
 static bool isValidDate(string &date);

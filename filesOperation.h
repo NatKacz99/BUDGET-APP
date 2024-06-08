@@ -3,9 +3,11 @@
 
 #include <iostream>
 #include <vector>
+#include <cstdlib>
 #include "Markup.h"
 #include "File.h"
 #include "Operation.h"
+#include "cashMethods.h"
 
 using namespace std;
 
@@ -15,7 +17,7 @@ class FilesOperation : public File
 public:
     FilesOperation (string fileName) : File(fileName) {}
     vector <Operation> loadOperationsFromFile (const int loggedUserId);
-    bool addOperationToFile (const Operation &operation);
+    bool addOperationToFile (Operation &operation);
 };
 
 #endif

@@ -69,27 +69,34 @@ bool UserFile::addUserToFile (User &user)
     system("pause");
     return true;
 }
-bool UserFile::changePasswordInFile(int id, const string &password)
+bool UserFile::changePasswordInFile(int &id, const string &password)
 {
-    if(!xml.Load(getFileName())){
-        cout << "File doesn't exist" << endl;
+    if (!xml.Load(getFileName())) {
+        cout << "Error: File doesn't exist or cannot be loaded." << endl;
         return false;
     }
-    else{
-        while (xml.FindElem("User")){
-            xml.IntoElem();
-            xml.FindElem("id");
+    xml.ResetPos();
+    xml.FindElem("Root");
+    xml.IntoElem();
 
-            if (stoi(xml.GetData()) == id){
-                xml.FindElem("password");
-                xml.SetData(password);
-                xml.Save(getFileName());
-                cout << "Password has been changed" << endl;
-                return true;
+    while(xml.FindElem("User")){
+        xml.IntoElem();
+        xml.FindElem("id");
+
+        if (to_string(id) == xml.GetData())
+        {
+            xml.FindElem("password");
+            xml.SetData(password);
+
+            if (!xml.Save(getFileName())) {
+                cout << "Error: Unable to save changes to the file." << endl;
+                return false;
             }
+            cout << "Password has been changed" << endl;
+            xml.OutOfElem();
+            return true;
         }
         xml.OutOfElem();
     }
-    cout << "User with this id doesn't exist" << endl;
-    return false;
+        return false;
 }

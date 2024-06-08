@@ -15,32 +15,53 @@ void DateMethods::calculateCurrentDate(map<string, int> &currentDate)
     currentDate["month"] = currentTm.tm_mon + 1;
     currentDate["day"] = currentTm.tm_mday;
 }
-int DateMethods::isYearLeap(int year)
-{
-    if ((year % 4 == 0 && year % 100 != 0) || year % 400 == 0)
-    {
-        return 29;
+bool DateMethods::isYearLeap(string &year){
+    if ((stoi(year) % 4 == 0 && stoi(year) % 100 != 0) || (stoi(year) % 400 == 0)){
+        return true;
     }
-    else return 28;
+    else{
+        return false;
+    }
+}
+int DateMethods::returnNumberOfDaysInMonth(string year, string month)
+{
+    map <int,int> daysOfMonths;
+
+    daysOfMonths[1] = 31;
+    daysOfMonths[3] = 31;
+    daysOfMonths[4] = 30;
+    daysOfMonths[5] = 31;
+    daysOfMonths[6] = 30;
+    daysOfMonths[7] = 31;
+    daysOfMonths[8] = 31;
+    daysOfMonths[9] = 30;
+    daysOfMonths[10] = 31;
+    daysOfMonths[11] = 30;
+    daysOfMonths[12] = 31;
+
+    if (isYearLeap(year) == true){
+        daysOfMonths[2] = 29;
+    }
+    else{
+        daysOfMonths[2] = 28;
+    }
+
+    return daysOfMonths[stoi(month)];
 }
 bool DateMethods::isValidDate(string &date)
 {
-    if(date.length() != 10)
-    {
-        cout << "Invalid date format. Try enter again" << endl;
-        system("pause");
+    if (date.length() != 10){
+        cout << "Invalid date format. Please enter the date in format with 10 symbols." << endl;
         return false;
     }
-    for (size_t i = 0; i < date.length(); i++)
-    {
-        if (isdigit(date[0] && date[1] && date[2] && date[3] && date[5] && date[6] && date[8] && date[9]) && date[4] == '-' && date[7] == '-')
-        {
-            return true;
+
+    for (int i = 0; i < 10; ++i){
+        if ((i == 4 || i == 7) && date[i] != '-'){
+            cout << "Invalid date format. Please enter the date in YYYY-MM-DD format." << endl;
+            return false;
         }
-        else
-        {
-            cout << "Invalid date format. Try enter again" << endl;
-            system("pause");
+        else if (i != 4 && i != 7 && !isdigit(date[i])){
+            cout << "Invalid date format. Please enter the date in YYYY-MM-DD format." << endl;
             return false;
         }
     }
@@ -60,21 +81,42 @@ bool DateMethods::isValidDate(string &date)
         cout << "Incorrect date format. Try again" << endl;
         return false;
     }
+
+    string year = date.substr(0, 4);
+    string month = date.substr(5, 2);
+    string day = date.substr(8, 2);
+
+    if (stoi(month) < 1 || stoi(month) > 12) {
+        cout << "Invalid month. Please enter a month between 01 and 12." << endl;
+        return false;
+    }
+
+    int daysInMonth = returnNumberOfDaysInMonth(year, month);
+    if (stoi(day) < 1 || stoi(day) > daysInMonth) {
+        cout << "Invalid day. Please enter a valid day for the given month." << endl;
+        return false;
+    }
+
+    int inputDate = convertStringDateToInt(date);
+    if (stoi(year) < 2000 || inputDate > getCurrentDate()) {
+        cout << "Date doesn't fit in the correct period. Enter a date between 2000-01-01 and the current date." << endl;
+        return false;
+    }
     return true;
 }
 int DateMethods::convertStringDateToInt(const string &dateAsString)
 {
     string dateCopy = dateAsString;
     dateCopy.erase(4,1);
-    dateCopy.erase(7,1);
-    int dateAsInt = stoi(dateAsString);
+    dateCopy.erase(6,1);
+    int dateAsInt = stoi(dateCopy);
     return dateAsInt;
 }
 string DateMethods::convertIntDateToStringWithDashes(int dateAsInt)
 {
     string dateAsString = to_string(dateAsInt);
     dateAsString.insert(4, "-");
-    dateAsString.insert(6, "-");
+    dateAsString.insert(7, "-");
     return dateAsString;
 }
 int DateMethods::getCurrentMonthFirstDayDate()
@@ -96,50 +138,53 @@ int DateMethods::getCurrentMonthFirstDayDate()
 }
 int DateMethods::getPreviousMonthLastDayDate()
 {
-    tm now_tm = getCurrentTime();
-    now_tm.tm_mday = 0;
-    now_tm.tm_mon -= 1;
-    if(now_tm.tm_mon == 0){
-        now_tm.tm_year -= 1;
-        now_tm.tm_mon = 11;
+    stringstream ss(convertIntDateToStringWithDashes(getCurrentDate()));
+    string phrase, month;
+    int year, monthAmount, day;
+
+    getline(ss, phrase, '-');
+    year = stoi(phrase);
+    getline(ss, phrase, '-');
+    month = phrase;
+    monthAmount = stoi(month);
+
+    if (monthAmount == 1) {
+        year -= 1;
+        monthAmount = 12;
+    } else {
+        monthAmount -= 1;
     }
 
-    time_t last_day_c = mktime(&now_tm);
-    tm* last_day_tm = localtime(&last_day_c);
+    day = returnNumberOfDaysInMonth(to_string(year), to_string(monthAmount));
 
-    int year = last_day_tm->tm_year + 1900;
-    int month = last_day_tm->tm_mon + 1;
-    int day = last_day_tm->tm_mday;
-    string previousMonthLastDay
-    = to_string(year) + '-'
-    + (month < 10 ? "0" : "") +
-    to_string(month) + '-' +
-    (day < 10 ? "0" : "") +
-    to_string(day);
+    string previousMonthLastDay = to_string(year) + '-' +
+                                  (monthAmount < 10 ? "0" : "") + to_string(monthAmount) + '-' +
+                                  (day < 10 ? "0" : "") + to_string(day);
+
     return convertStringDateToInt(previousMonthLastDay);
 }
 int DateMethods::getPreviousMonthFirstDayDate()
 {
-    tm now_tm = getCurrentTime();
-    now_tm.tm_mday = 1;
-    now_tm.tm_mon -= 1;
-    if(now_tm.tm_mon == 0){
-        now_tm.tm_year -= 1;
-        now_tm.tm_mon = 11;
+    stringstream ss(convertIntDateToStringWithDashes(getCurrentDate()));
+    string phrase, month;
+    int year, monthAmount;
+
+    getline(ss, phrase, '-');
+    year = stoi(phrase);
+    getline(ss, phrase, '-');
+    month = phrase;
+    monthAmount = stoi(month);
+
+    if (monthAmount == 1) {
+        year -= 1;
+        monthAmount = 12;
+    } else {
+        monthAmount -= 1;
     }
 
-    time_t last_day_c = mktime(&now_tm);
-    tm* last_day_tm = localtime(&last_day_c);
-
-    int year = last_day_tm->tm_year + 1900;
-    int month = last_day_tm->tm_mon + 1;
-    int day = last_day_tm->tm_mday;
-    string previousMonthFirstDay
-    = to_string(year) + '-'
-    + (month < 10 ? "0" : "") +
-    to_string(month) + '-' +
-    (day < 10 ? "0" : "") +
-    to_string(day);
+    string previousMonthFirstDay = to_string(year) + '-' +
+                                   (monthAmount < 10 ? "0" : "") + to_string(monthAmount) + '-' +
+                                   "01";
     return convertStringDateToInt(previousMonthFirstDay);
 }
 int DateMethods::getCurrentDate()

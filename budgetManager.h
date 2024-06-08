@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <algorithm>
+#include <iomanip>
 #include <cmath>
 #include <cstdlib>
 #include "itemType.h"
@@ -35,7 +36,7 @@ public:
     void showCurrentMonthBalance();
     void showPreviousMonthBalance();
     void showCustomPeriodBalance();
-    void showSingleOperationDetails(Operation operation);
+    void showSingleOperationDetails(Operation &operation);
 };
 
 #endif

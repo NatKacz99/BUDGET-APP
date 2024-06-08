@@ -66,8 +66,8 @@ void UserManager::loginUser()
     string login = "", password = "";
     cout << "Enter login: " << endl;
     login = AuxiliaryMethod::enterLine();
-    for(User user : users){
-        if(checkIfLoginExists(login)){
+    for(User &user : users){
+        if(user.login == login){
                 for (int trials = 3; trials > 0; trials--){
                     cout << "Enter your password, " << trials << " attempts left: ";
                     password = AuxiliaryMethod::enterLine();
@@ -89,20 +89,25 @@ void UserManager::loginUser()
 void UserManager::changeUserPassword()
 {
     string currentPassword, newPassword;
-    cout << "Enter current password: " << endl;
+    cout << "Enter current password: ";
     currentPassword = AuxiliaryMethod::enterLine();
-    for(User user : users){
-        if(currentPassword == user.password){
-            cout << "Enter new password: ";
-            newPassword = AuxiliaryMethod::enterLine();
-            user.password = newPassword;
-            userFile.changePasswordInFile(user.id, user.password);
-        }
-        else {
-            cout << "Incorrect password. Try again" << endl;
-            system("pause");
+    for(User &user : users){
+        if(user.id == loggedUserId){
+            if(currentPassword == user.password){
+                cout << "Enter new password: ";
+                newPassword = AuxiliaryMethod::enterLine();
+                user.password = newPassword;
+                userFile.changePasswordInFile(user.id, user.password);
+                system("pause");
+                break;
+            }
+            else{
+                cout << "Incorrect password. Try again" << endl;
+                system("pause");
+            }
         }
     }
+    return;
 }
 void UserManager::logoutUser()
 {

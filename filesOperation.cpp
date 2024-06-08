@@ -20,12 +20,15 @@ vector <Operation> FilesOperation::loadOperationsFromFile (const int loggedUserI
 
             xml.FindElem("id");
             operation.id = stoi(xml.GetData());
+            if (operation.id > lastId) {
+                    lastId = operation.id;
+                }
 
             xml.FindElem("userId");
             operation.userId = stoi(xml.GetData());
 
             xml.FindElem("date");
-            operation.date = xml.GetData();
+            operation.date = stoi(xml.GetData());
 
             xml.FindElem("item");
             operation.item = xml.GetData();
@@ -44,28 +47,31 @@ vector <Operation> FilesOperation::loadOperationsFromFile (const int loggedUserI
     }
     return operations;
 }
-bool FilesOperation::addOperationToFile (const Operation &operation)
+bool FilesOperation::addOperationToFile (Operation &operation)
 {
     if(!xml.Load(getFileName())){
         xml.SetDoc("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n");
         xml.AddElem("Root");
     }
-    else{
-        xml.ResetPos();
-        xml.FindElem();
-        xml.IntoElem();
-        xml.AddElem("Operation");
-        xml.IntoElem();
-        xml.AddElem("id", to_string(operation.id));
-        xml.AddElem("userId", to_string(operation.userId));
-        xml.AddElem("date", operation.date);
-        xml.AddElem("item", operation.item);
-        xml.AddElem("amount", operation.amount);
+    xml.ResetMainPos();
+    xml.FindElem("Root");
+    xml.IntoElem();
+    xml.AddElem("Operation");
+    xml.IntoElem();
+    xml.AddElem("id", to_string(operation.id));
+    xml.AddElem("userId", to_string(operation.userId));
+    xml.AddElem("date", operation.date);
+    xml.AddElem("item", operation.item);
+    string formattedAmount = CashMethods::formatAmount(operation.amount);
+    xml.AddElem("amount", formattedAmount);
+    xml.OutOfElem();
+    xml.OutOfElem();
 
-        xml.Save(getFileName());
-        xml.OutOfElem();
-        cout << "You added operation right" << endl;
-        return true;
+    if (!xml.Save(getFileName())){
+        cerr << "Error: Unable to save the XML file" << endl;
+        return false;
     }
-    return false;
+    operation.id = getLastId() + 1;
+    lastId = operation.id;
+    return true;
 }

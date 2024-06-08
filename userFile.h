@@ -17,7 +17,7 @@ public:
     }
     vector <User> loadUsersFromFile();
     bool addUserToFile (User &user);
-    bool changePasswordInFile(int id, const string &password);
+    bool changePasswordInFile(int &id, const string &password);
 };
 
 #endif
